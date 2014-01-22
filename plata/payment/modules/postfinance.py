@@ -120,13 +120,19 @@ class PaymentProcessor(ProcessorBase):
             POSTFINANCE['SHA1_IN'],
         ))).hexdigest()
 
-        return self.shop.render(request, 'payment/%s_form.html' % self.key, {
-            'order': order,
-            'HTTP_HOST': request.META.get('HTTP_HOST'),
-            'form_params': form_params,
-            'locale': locale.normalize(
-                to_locale(get_language())).split('.')[0],
-        })
+        return self.shop.render(
+            request,
+            'payment/%s_form.html' % self.key,
+            self.shop.get_context(
+                request, {
+                    'order': order,
+                    'HTTP_HOST': request.META.get('HTTP_HOST'),
+                    'form_params': form_params,
+                    'locale': locale.normalize(
+                        to_locale(get_language())).split('.')[0],
+                }
+            )
+        )
 
     @csrf_exempt_m
     def ipn(self, request):
