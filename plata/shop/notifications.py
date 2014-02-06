@@ -111,9 +111,13 @@ class BaseHandler(object):
 
 
 class EmailHandler(BaseHandler):
-    def __init__(self, always_to=None, always_bcc=None):
+    template = None
+
+    def __init__(self, always_to=None, always_bcc=None, template=None):
         self.always_to = always_to
         self.always_bcc = always_bcc
+        if template:
+            self.template = template
 
     def __call__(self, sender, **kwargs):
         email = self.message(sender, **kwargs)
@@ -144,10 +148,11 @@ class ContactCreatedHandler(EmailHandler):
             ContactCreatedHandler(always_bcc=['owner@example.com']),
             weak=False)
     """
+    template = 'plata/notifications/contact_created.txt'
 
     def message(self, sender, contact, **kwargs):
         message = self.create_email_message(
-            'plata/notifications/contact_created.txt',
+            self.template,
             contact=contact,
             **kwargs)
         message.to.append(contact.user.email)
@@ -166,13 +171,14 @@ class SendInvoiceHandler(EmailHandler):
             SendInvoiceHandler(always_bcc=['owner@example.com']),
             weak=False)
     """
+    template = 'plata/notifications/order_paid.txt'
 
     def message(self, sender, order, **kwargs):
         if order.language_code:
             activate(order.language_code)
 
         message = self.create_email_message(
-            'plata/notifications/order_paid.txt',
+            self.template,
             order=order,
             **kwargs)
 
@@ -197,13 +203,14 @@ class SendPackingSlipHandler(EmailHandler):
             SendPackingSlipHandler(always_to=['warehouse@example.com']),
             weak=False)
     """
+    template = 'plata/notifications/packing_slip.txt'
 
     def message(self, sender, order, **kwargs):
         if order.language_code:
             activate(order.language_code)
 
         message = self.create_email_message(
-            'plata/notifications/packing_slip.txt',
+            self.template,
             order=order,
             **kwargs)
         message.attach(
@@ -225,6 +232,8 @@ shop_signals.order_paid.connect(
 shop_signals.order_paid.connect(
     notifications.SendPackingSlipHandler(
         always_to=[],
-        always_bcc=[]),
+        always_bcc=[],
+        template='custom/packing_slip_email.txt',
+    ),
     weak=False)
 """
