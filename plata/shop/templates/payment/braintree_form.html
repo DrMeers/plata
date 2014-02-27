@@ -1,0 +1,50 @@
+{% extends base_template|default:"base.html" %}
+
+{% load url from future %}
+{% load i18n %}
+
+{% block content %}
+  <h1>{% trans "Payment" %}</h1>
+
+  <div>
+    <form action="{% url 'plata_payment_braintree_submit' %}" method="POST" id="braintree-payment-form">
+      {% csrf_token %}
+      <table>
+        <tr>
+          <th>
+            <label for="id_number">Card Number</label>
+          </th>
+          <td>
+            <input id="id_number" type="text" size="20" autocomplete="off" data-encrypted-name="number" />{# DO NOT enter a "name" attribute here! #}
+          </td>
+        </tr>
+        <tr>
+          <th>
+            <label for="id_cvv">CVV</label>
+          </th>
+          <td>
+            <input id="id_cvv" type="text" size="4" autocomplete="off" data-encrypted-name="cvv" />
+          </td>
+        </tr>
+        <tr>
+          <th>
+            <label for="id_month">Expiration (MM/YYYY)</label>
+          </th>
+          <td class="expiration">
+            <input id="id_month" type="text" size="2" name="month" /> /
+            <input id="id_year" type="text" size="4" name="year" />
+          </td>
+        </tr>
+        <tr>
+          <th></th>
+          <td><input type="submit" id="submit" /></td>
+        </tr>
+      </table>
+    </form>
+  </div>
+  <script src="https://js.braintreegateway.com/v1/braintree.js"></script>
+  <script>
+    var braintree = Braintree.create("{{ BRAINTREE_CSE_KEY }}");
+    braintree.onSubmitEncryptForm('braintree-payment-form');
+  </script>
+{% endblock %}
