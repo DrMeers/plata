@@ -126,6 +126,7 @@ class Shop(object):
     confirmation_template = 'plata/shop_confirmation.html'
     success_template = 'plata/shop_order_success.html'
     failure_template = 'plata/shop_order_payment_failure.html'
+    default_order_new_redirect_url = '/'
 
     def __init__(self, contact_model, order_model, discount_model,
                  default_currency=None, **kwargs):
@@ -665,4 +666,4 @@ class Shop(object):
         if next:
             return HttpResponseRedirect(next)
 
-        return HttpResponseRedirect('/')
+        return HttpResponseRedirect(self.default_order_new_redirect_url)
