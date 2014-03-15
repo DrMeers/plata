@@ -122,7 +122,7 @@ class PaymentProcessor(ProcessorBase):
                 if result.transaction.credit_card else 'Unknown'
             )
 
-            if result.transaction.status in SUCCESS_STATUSES
+            if result.transaction.status in SUCCESS_STATUSES:
                 payment.authorized = timezone.now()
                 payment.status = OrderPayment.AUTHORIZED
 
