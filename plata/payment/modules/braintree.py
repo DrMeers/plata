@@ -34,6 +34,12 @@ from plata.shop.models import OrderPayment
 
 logger = logging.getLogger('plata.payment.braintree')
 
+SUCCESS_STATUSES = (
+    braintree.Transaction.Status.SubmittedForSettlement,
+    braintree.Transaction.Status.Settling,
+    braintree.Transaction.Status.Settled,
+)
+
 braintree.Configuration.configure(
     getattr(braintree.Environment, settings.BRAINTREE['ENVIRONMENT']),
     settings.BRAINTREE['MERCHANT_ID'],
@@ -116,7 +122,7 @@ class PaymentProcessor(ProcessorBase):
                 if result.transaction.credit_card else 'Unknown'
             )
 
-            if result.transaction.status == 'submitted_for_settlement':
+            if result.transaction.status in SUCCESS_STATUSES
                 payment.authorized = timezone.now()
                 payment.status = OrderPayment.AUTHORIZED
 
